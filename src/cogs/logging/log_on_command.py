@@ -1,4 +1,5 @@
 import logging
+import discord
 from discord.ext import commands
 
 
@@ -12,6 +13,17 @@ class CommandListener(commands.Cog):
     @commands.Cog.listener(name='on_command')
     async def log_commands(self, ctx):
         logger.info(f'{ctx.guild.name} -- {ctx.author} -- Used {ctx.command}')
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        """
+        This is an error handler for command errors.
+        For a list of command errors -> https://discordpy.readthedocs.io/en/latest/ext/commands/api.html#exceptions
+        """
+        await ctx.send("That command does not exist. Try again.")
+
+        if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+            logger.info(f"ERROR: {ctx.guild.name} -- {ctx.author} -- {error}")
 
 
 async def setup(bot: commands.Bot) -> None:
