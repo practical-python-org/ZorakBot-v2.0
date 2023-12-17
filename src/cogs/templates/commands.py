@@ -1,4 +1,5 @@
 from discord.ext import commands
+from logger import *
 
 
 class Ping(commands.Cog):
@@ -7,6 +8,7 @@ class Ping(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx: commands.Context) -> None:
+        log_debug("Ping command used.")
         await ctx.channel.send("poing")
 
 
