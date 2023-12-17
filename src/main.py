@@ -4,7 +4,8 @@ import logging
 import discord
 from discord.ext import commands
 
-from logger import setup_logger
+from logs.logger import setup_logger
+
 
 logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
@@ -28,8 +29,12 @@ async def load_cogs(robot: commands.Bot) -> None:
         if not directory.startswith("_") and directory != "templates":
             for file in os.listdir(f"./cogs/{directory}"):
                 if file.endswith('.py') and not file.startswith("_"):
-                    logger.info(f"Loading Cog: \\{directory}\\{file}")
-                    await robot.load_extension(f"cogs.{directory}.{file[:-3]}")
+                    logger.debug(f"Loading Cog: \\{directory}\\{file}")
+                    try:
+                        await robot.load_extension(f"cogs.{directory}.{file[:-3]}")
+                    except Exception as e:
+                        logger.warning("- - - Cog failed to load!!")
+                        logger.warning(f"- - - {e}")
     logger.info("... Success.")
 
 

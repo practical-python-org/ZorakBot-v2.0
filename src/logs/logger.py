@@ -8,11 +8,11 @@ def setup_logger(
     stream_logs: bool = False,
 ) -> None:
     """
-    Sets up the service logger
+    Sets up the service logs
     Parameters
     ----------
     level : int
-        Level to log in the main logger
+        Level to log in the main logs
     stream_logs : bool
         Flag to stream the logs to the console
     """
