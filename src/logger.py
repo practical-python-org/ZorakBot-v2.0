@@ -1,38 +1,28 @@
-"""
-Controls the logging for the entire application.
-"""
+from __future__ import annotations
 import os
 import logging
-import pathlib
 
 
-logging.basicConfig(filename=pathlib.Path("logs", "BotLog.txt"),
-                    format="%(asctime)s - %(levelname)s: %(message)s",
-                    datefmt="%Y-%m-%d %H:%M.%S",
-                    filemode="w")
+def setup_logger(
+    level: int = int(os.getenv("LOG_LEVEL")),
+    stream_logs: bool = False,
+) -> None:
+    """
+    Sets up the service logger
+    Parameters
+    ----------
+    level : int
+        Level to log in the main logger
+    stream_logs : bool
+        Flag to stream the logs to the console
+    """
+    log_formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
 
-logger = logging.getLogger()
-logger.setLevel(int(os.getenv("LOG_LEVEL")))
+    handlers: list[logging.Handler] = []
+    if stream_logs:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(log_formatter)
+        stream_handler.setLevel(level)
+        handlers.append(stream_handler)
 
-
-def log_debug(thing: object) -> None:
-    """ Logs at the debug level """
-    logger.debug(thing)
-
-
-def log_info(thing: object) -> None:
-    """ Logs at the info level """
-    print(thing)
-    logger.info(thing)
-
-
-def log_warn(thing: object) -> None:
-    """ Logs at the warn level """
-    print(thing)
-    logger.warning(thing)
-
-
-def log_critical(thing: object) -> None:
-    """ Logs at the critical level """
-    print(thing)
-    logger.critical(thing)
+    logging.basicConfig(level=level, handlers=handlers)
