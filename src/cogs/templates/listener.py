@@ -1,6 +1,9 @@
+import logging
 import discord
 from discord.ext import commands
-from logger import *
+
+
+logger = logging.getLogger(__name__)
 
 
 class MessageListener(commands.Cog):
@@ -10,7 +13,7 @@ class MessageListener(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.message) -> None:
         if not message.author.bot:
-            log_debug('Message has been sent.')
+            logger.debug('Message has been sent.')
 
 
 async def setup(bot: commands.Bot) -> None:
