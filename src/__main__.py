@@ -47,7 +47,7 @@ async def load_cogs(robot: commands.Bot) -> None:
     """
     logger.info("Loading Cogs...")
     for directory in os.listdir("./cogs"):
-        if not directory.startswith("_") and directory != "templates":
+        if not directory.startswith("_"):
             for file in os.listdir(f"./cogs/{directory}"):
                 if file.endswith('.py') and not file.startswith("_"):
                     logger.debug(f"Loading Cog: \\{directory}\\{file}")
