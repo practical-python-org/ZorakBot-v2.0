@@ -17,27 +17,6 @@ def infra_setup() -> None:
     setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
 
-async def load_cogs(robot: commands.Bot) -> None:
-    """
-    Loads the directories under the /cogs/ folder,
-    then digs through those directories and loads the cogs.
-
-    We do not load files starting with _ and the templates folder.
-    """
-    logger.info("Loading Cogs...")
-    for directory in os.listdir("./cogs"):
-        if not directory.startswith("_") and directory != "templates":
-            for file in os.listdir(f"./cogs/{directory}"):
-                if file.endswith('.py') and not file.startswith("_"):
-                    logger.debug(f"Loading Cog: \\{directory}\\{file}")
-                    try:
-                        await robot.load_extension(f"cogs.{directory}.{file[:-3]}")
-                    except Exception as e:
-                        logger.warning("- - - Cog failed to load!!")
-                        logger.warning(f"- - - {e}")
-    logger.info("... Success.")
-
-
 def load_key_and_run() -> None:
     """
     Loads the bot key as the first arg when running the bot OR from an env variable.
@@ -57,6 +36,27 @@ def load_key_and_run() -> None:
         logger.critical('You must include a bot token...')
         logger.critical("TOKEN must be in the .env file")
         logger.critical('OR you must run the bot using: "python __main__.py TOKEN=YOUR_DISCORD_TOKEN"')
+
+
+async def load_cogs(robot: commands.Bot) -> None:
+    """
+    Loads the directories under the /cogs/ folder,
+    then digs through those directories and loads the cogs.
+
+    We do not load files starting with _ and the templates folder.
+    """
+    logger.info("Loading Cogs...")
+    for directory in os.listdir("./cogs"):
+        if not directory.startswith("_") and directory != "templates":
+            for file in os.listdir(f"./cogs/{directory}"):
+                if file.endswith('.py') and not file.startswith("_"):
+                    logger.debug(f"Loading Cog: \\{directory}\\{file}")
+                    try:
+                        await robot.load_extension(f"cogs.{directory}.{file[:-3]}")
+                    except Exception as e:
+                        logger.warning("- - - Cog failed to load!!")
+                        logger.warning(f"- - - {e}")
+    logger.info("... Success.")
 
 
 @bot.event
