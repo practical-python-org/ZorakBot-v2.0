@@ -12,5 +12,5 @@ class MessageListener(commands.Cog):
             print('Message has been sent.')
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(MessageListener(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(MessageListener(bot))

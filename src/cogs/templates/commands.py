@@ -10,6 +10,6 @@ class Ping(commands.Cog):
         await ctx.channel.send("poing")
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(Ping(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Ping(bot))
 
