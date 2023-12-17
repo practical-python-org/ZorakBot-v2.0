@@ -13,7 +13,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
 
 
-def infra_setup():
+def infra_setup() -> None:
     setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
 
@@ -38,7 +38,7 @@ async def load_cogs(robot: commands.Bot) -> None:
     logger.info("... Success.")
 
 
-def load_key_and_run():
+def load_key_and_run() -> None:
     """
     Loads the bot key as the first arg when running the bot OR from an env variable.
     For example:
