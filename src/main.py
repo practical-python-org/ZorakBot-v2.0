@@ -1,14 +1,19 @@
 import os
 import sys
+import logging
 import discord
 from discord.ext import commands
 
-from logger import *
+from logger import setup_logger
 
-
+logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
+
+
+def infra_setup():
+    setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
 
 async def load_cogs(robot: commands.Bot) -> None:
@@ -18,14 +23,14 @@ async def load_cogs(robot: commands.Bot) -> None:
 
     We do not load files starting with _ and the templates folder.
     """
-    log_info("Loading Cogs...")
+    logger.info("Loading Cogs...")
     for directory in os.listdir("./cogs"):
         if not directory.startswith("_") and directory != "templates":
             for file in os.listdir(f"./cogs/{directory}"):
                 if file.endswith('.py') and not file.startswith("_"):
-                    log_debug(f"Loading Cog: \\{directory}\\{file}")
+                    logger.info(f"Loading Cog: \\{directory}\\{file}")
                     await robot.load_extension(f"cogs.{directory}.{file[:-3]}")
-    log_info(" - Success.")
+    logger.info("... Success.")
 
 
 def load_key_and_run():
@@ -36,17 +41,17 @@ def load_key_and_run():
     """
     if len(sys.argv) > 1:  # Check args for the token first
         token = sys.argv[1].replace('TOKEN=','')
-        log_debug('Loading Token from arg.')
+        logger.debug('Loading Token from arg.')
         bot.run(token)
 
     elif os.environ['TOKEN'] is not None:  # if not in args, check the env vars
-        log_debug('Loading Token from environment variable.')
+        logger.debug('Loading Token from environment variable.')
         bot.run(os.environ['TOKEN'])
 
     else:
-        log_critical('You must include a bot token...')
-        log_critical("TOKEN must be in the .env file")
-        log_critical('OR you must run the bot using: "python __main__.py TOKEN=YOUR_DISCORD_TOKEN"')
+        logger.critical('You must include a bot token...')
+        logger.critical("TOKEN must be in the .env file")
+        logger.critical('OR you must run the bot using: "python __main__.py TOKEN=YOUR_DISCORD_TOKEN"')
 
 
 @bot.event
@@ -54,7 +59,7 @@ async def setup_hook() -> None:
     """
     The setup_hook executes before the bot logs in.
     """
-    log_debug("Executing set up hook...")
+    logger.debug("Executing set up hook...")
     await load_cogs(bot)
 
 
@@ -63,8 +68,8 @@ async def on_ready() -> None:
     """
     The on_ready is executed AFTER the bot logs in.
     """
-    log_debug("Executing on_ready event.")
-    log_info(f'Logged in as {bot.user.name} - ({bot.user.id})')
+    logger.debug("Executing on_ready event.")
+    logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
-
+infra_setup()
 load_key_and_run()
