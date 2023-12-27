@@ -47,10 +47,11 @@ class LogMessages(commands.Cog):
         """
         audit_log = [entry async for entry in message.guild.audit_logs(limit=1)][0]
 
-        # If the audit log is triggered, it means someone OTHER than the author deleted the message.
-        # https://discordpy.readthedocs.io/en/stable/api.html
-        # ?highlight=audit%20log#discord.AuditLogAction.message_delete
         if str(audit_log.action) == 'AuditLogAction.message_delete':
+            """            
+            If the audit log is triggered, it means someone OTHER than the author deleted the message.
+            https://discordpy.readthedocs.io/en/stable/api.html?highlight=audit%20log#discord.AuditLogAction.message_delete
+            """
             logger.info(f"Moderator ({audit_log.author.name}) removed message in {audit_log.channel}")
             # TODO: Replace log channel with entry in the DB.
             # embed = channel_embed(audit_log, message)
@@ -59,14 +60,6 @@ class LogMessages(commands.Cog):
             return
 
         else:
-            # Otherwise, the author deleted it.
-            for role in message.author.roles:
-                if role.permissions.manage_messages:
-                    logger.info(f"{message.author.name} deleted a message in {message.channel}")
-                    # TODO: Replace log channel with entry in the DB.
-            #         await logs_channel.send(embed=channel_embed(message.author, message))
-            #         return
-            #
             logger.info(f"{message.author.name} deleted a message in {message.channel}")
             # TODO: Replace log channel with entry in the DB.
             # await logs_channel.send(f"{message.author.mention}", embed=channel_embed(message.author, message))
