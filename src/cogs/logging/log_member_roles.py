@@ -10,9 +10,12 @@ def embed_role_add(some_member, member_who_did_action, role_obj) -> discord.Embe
     """
     Embedding for user kick alerts.
 
-    :param some_member: discord.Member - The receiver of the action
-    :param member_who_did_action: discord.Member - The person who did the action
-    :param role_obj: discord.Role - The role in question
+    :param some_member: discord.Member
+        - The receiver of the action
+    :param member_who_did_action: discord.Member
+        - The person who did the action
+    :param role_obj: discord.Role
+        - The role in question
     """
     embed = discord.Embed(
         title=':green_square: Role Update'
