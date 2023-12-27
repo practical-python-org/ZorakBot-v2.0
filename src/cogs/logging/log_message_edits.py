@@ -41,7 +41,7 @@ def channel_embed(author, message_before, message_after) -> discord.Embed:
     return embed
 
 
-class LogMessages(commands.Cog):
+class LogMessageEdits(commands.Cog):
     """
     Simple listener to on_message_edit
     """
@@ -79,4 +79,4 @@ async def setup(bot: commands.Bot) -> None:
     """
     Necessary for loading the cog into the bot instance.
     """
-    await bot.add_cog(LogMessages(bot))
+    await bot.add_cog(LogMessageEdits(bot))
