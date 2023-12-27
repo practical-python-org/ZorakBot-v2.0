@@ -52,7 +52,7 @@ class LogMessages(commands.Cog):
             If the audit log is triggered, it means someone OTHER than the author deleted the message.
             https://discordpy.readthedocs.io/en/stable/api.html?highlight=audit%20log#discord.AuditLogAction.message_delete
             """
-            logger.info(f"Moderator ({audit_log.author.name}) removed message in {audit_log.channel}")
+            logger.info(f"Moderator ({audit_log.user.name}) removed message in {message.channel}")
             # TODO: Replace log channel with entry in the DB.
             # embed = channel_embed(audit_log, message)
             # await logs_channel.send(embed=channel_embed(audit_log, message))
