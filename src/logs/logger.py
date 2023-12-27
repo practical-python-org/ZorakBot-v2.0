@@ -16,7 +16,7 @@ def setup_logger(
     stream_logs : bool
         Flag to stream the logs to the console
     """
-    log_formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+    log_formatter = logging.Formatter("%(asctime)s %(levelname)s [LOG] - %(message)s")
 
     handlers: list[logging.Handler] = []
     if stream_logs:
