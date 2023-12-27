@@ -30,8 +30,7 @@ Checklist:
     - **fun** - Fun commands
     - **logging** - All logging cogs 
     - **tools** - utilities, auto-features, random...
-  
--  **/logs**
+- logger.py
 - main.py
 - .env
       
