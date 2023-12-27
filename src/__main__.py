@@ -4,7 +4,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from logs.logger import setup_logger
+from __logger__ import setup_logger
 
 
 logger = logging.getLogger(__name__)
