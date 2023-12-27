@@ -39,16 +39,16 @@ class LogLeaving(commands.Cog):
         First we don't log leaves for unapproved people.
         then we grab the guild, and from there read the last entry in the audit log.
         """
-        # TODO: Update this to pull form DB!
-        if "Needs Approval" in [role.name for role in member.roles]:
-            return
+        # TODO: [verification!] - Update this to pull form DB!
+        # if "Needs Approval" in [role.name for role in member.roles]:
+        #     return
 
         audit_log = [entry async for entry in member.guild.audit_logs(limit=1)][0]
 
         if str(audit_log.action) != "AuditLogAction.ban" and str(audit_log.action) != "AuditLogAction.kick":
             embed = embed_leave(member)
 
-            logger.info(f"{member.namae} has left {member.guild.name}")
+            logger.info(f"{member.name} has left {member.guild.name}")
             # # TODO: Replace log channel with entry in the DB.
             # logs_channel = await self.bot.fetch_channel(self.bot.server_settings.log_channel["join_log"])
             # await logs_channel.send(embed=embed)
