@@ -3,10 +3,7 @@ import os
 import logging
 
 
-def setup_logger(
-    level: int = int(os.getenv("LOG_LEVEL")),
-    stream_logs: bool = False,
-) -> None:
+def setup_logger(level: int = int(os.getenv("LOG_LEVEL")), stream_logs: bool = False) -> None:
     """
     Sets up the service logs
     Parameters
@@ -16,7 +13,9 @@ def setup_logger(
     stream_logs : bool
         Flag to stream the logs to the console
     """
-    log_formatter = logging.Formatter("%(asctime)s %(levelname)s [LOG] - %(message)s")
+    log_formatter = logging.Formatter(
+        ":: %(asctime)s :: %(levelname)s :: %(filename)s line %(lineno)s --- %(message)s"
+        , "%m-%d %H:%M.%S")
 
     handlers: list[logging.Handler] = []
     if stream_logs:
