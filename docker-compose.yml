@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    container_name: zorak_postgres
+    env_file: .env
+    volumes:
+      - ./db:/data/db
+    restart: always
+
+  zorak-v2:
+    build: .
+    image: zorakv2
+    container_name: zorak_bot
+    env_file: .env
+    links:
+      - "postgres:postgres"
+    depends_on:
+      - postgres
+    restart: always
