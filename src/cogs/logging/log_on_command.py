@@ -15,7 +15,7 @@ class CommandListener(commands.Cog):
         logger.info(f'{ctx.guild.name} -- {ctx.author} -- Used {ctx.command}')
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error) -> None:
         """
         This is an error handler for command errors.
         For a list of command errors -> https://discordpy.readthedocs.io/en/latest/ext/commands/api.html#exceptions

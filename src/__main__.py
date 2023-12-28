@@ -4,7 +4,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from logs.logger import setup_logger
+from __logger__ import setup_logger
 
 
 logger = logging.getLogger(__name__)
@@ -13,11 +13,11 @@ intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
 
 
-def infra_setup() -> None:
+def setup() -> None:
     setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
 
-def load_key_and_run() -> None:
+def run_bot() -> None:
     """
     Loads the bot key as the first arg when running the bot OR from an env variable.
     For example:
@@ -76,5 +76,5 @@ async def on_ready() -> None:
     logger.debug("Executing on_ready event.")
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
-infra_setup()
-load_key_and_run()
+setup()
+run_bot()
