@@ -1,7 +1,7 @@
 FROM python:3.11.6-slim-bullseye AS builder-image
 ENV PYTHONUNBUFFERED=1
 WORKDIR /code
-COPY src /code/src
+COPY . /code/src
 
 RUN apt-get update && apt-get install -y ffmpeg
 
