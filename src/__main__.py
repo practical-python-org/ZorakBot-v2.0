@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from __logger__ import setup_logger
-
+import database
 
 logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
@@ -74,6 +74,7 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
+    database.connect_to_db()
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
 setup()
