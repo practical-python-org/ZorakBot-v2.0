@@ -74,6 +74,7 @@ class DB:
         Commit the current query
         """
         self.connection.commit()
+        self.connection.close()
 
     def select_one(self, query, *data):
         """
@@ -88,13 +89,13 @@ class DB:
         -------
         :return: The first result of the query
         """
+        self.create_cursor()
         if data:
             self.cursor.execute(query, data)
         else:
             self.cursor.execute(query)
         data = self.cursor.fetchone()
         self.connection.commit()
-        self.connection.close_cursor()
         return data
 
     def select_all(self, query, *data):
@@ -116,7 +117,6 @@ class DB:
             self.cursor.execute(query)
         data = self.cursor.fetchall()
         self.connection.commit()
-        self.connection.close_cursor()
         return data
 
     def update(self, query, data):
@@ -134,7 +134,6 @@ class DB:
         """
         self.cursor.execute(query, (data,))
         self.connection.commit()
-        self.connection.close_cursor()
 
     def insert(self, query, data):
         """
@@ -151,7 +150,6 @@ class DB:
         """
         self.cursor.execute(query, (data,))
         self.connection.commit()
-        self.connection.close_cursor()
 
     """ 
     2nd Layer.
@@ -274,5 +272,4 @@ class DB:
         """
         query = ("SELECT table_name FROM information_schema.tables"
                  " WHERE table_schema='public';")
-        logger.info(self.select_all(self, query))
-        return self.select_all(self, query)
+        return self.select_all(query)
