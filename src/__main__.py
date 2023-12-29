@@ -63,9 +63,10 @@ def connect_to_db(flag_db, client):
     if flag_db:
         db = DB(client)
         database_check = db.get_all_tables_in_database()
+        logger.info(f"Healthchecking database...")
         if database_check:
-            for table in database_check:
-                logger.info(f"- Successfully loaded {table}")
+            logger.info(f"Database is healthy and online.")
+
 
 @bot.event
 async def setup_hook() -> None:
