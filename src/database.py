@@ -3,6 +3,7 @@ import logging
 import psycopg2 as psycopg
 from dotenv import load_dotenv
 from datetime import datetime
+from discord.ext.commands import Bot
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -235,7 +236,7 @@ class DB:
         -------
         :return: boolean - if the member is in the database
         """
-        return self.is_data_in_db("members", "member_id", str(member_id))
+        return self.is_data_in_db("members", "discord_member_id", str(member_id))
 
     def is_role_in_db(self, role_id):
         """
@@ -286,7 +287,7 @@ class DB:
 
     # ---------- Add commands
     def add_guild_to_db(self, cur, g_name, g_logo, g_created_at, g_member_count, g_nsfw_level
-                        , g_language, dt_now, discord_guild_id):
+                        , g_language, dt_now, discord_guild_id, is_premium, is_test):
         """
         Adds a guild to the database, along with all of its corresponding information
 
@@ -305,8 +306,8 @@ class DB:
         """
         query = """INSERT 
                         INTO guilds
-                            (discord_guild_id, name, logo, created_at, member_count, nsfw_level, language, last_sync)
-                        VALUES((%s), (%s), (%s), (%s),(%s), (%s), (%s))"""
+                            (discord_guild_id, name, logo, created_at, member_count, nsfw_level, language, last_sync, is_premium, is_test)
+                        VALUES((%s), (%s), (%s), (%s),(%s), (%s), (%s), (%s), (%s))"""
         log.debug(f"Adding guild: {g_name}")
         cur.execute(
             query
@@ -317,10 +318,12 @@ class DB:
                , g_nsfw_level
                , g_language
                , dt_now
-               , str(discord_guild_id),)
+               , str(discord_guild_id)
+               , is_premium
+               , is_test)
         )
 
-    def add_settings_to_db(self, cur, discord_guild_id, logging, moderation, dt_now):
+    def add_settings_to_db(self, cur, discord_guild_id, discord_member_id, admin, logging, moderation, antispam, fun, dt_now):
         """
         Adds guild settings to the database
 
@@ -328,22 +331,29 @@ class DB:
         ----------
         :param cur: the db cursor
         :param discord_guild_id: the id of the discord guild
+        :param discord_member_id: the id of the discord bot
+        :param admin: the admin setting
         :param logging: the logging setting
         :param moderation: the moderation setting
+        :param antispam: the antispam setting
+        :param fun: the fun setting
         :param dt_now: the current datetime
-
         """
         query = """
-        INSERT INTO settings
-            (discord_guild_id, logging, moderation, last_sync)
-        VALUES((%s), (%s), (%s), (%s))
+        INSERT INTO bot_settings
+            (discord_guild_id, discord_bot_id, admin, logging, moderation, antispam, fun, last_sync)
+        VALUES((%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s));
                 """
-        log.debug(f"Adding settings to: {discord_guild_id}")
+        logger.debug(f"Adding bot_settings to: {discord_guild_id}")
         cur.execute(
             query
             , (str(discord_guild_id)
+               , discord_member_id
+               , admin
                , logging
                , moderation
+               , antispam
+               , fun
                , dt_now
                )
         )
@@ -423,7 +433,7 @@ class DB:
         """
         query = """INSERT 
                         INTO members
-                            (discord_guild_id, member_id, name, avatar, created_at, nickname, display_name, joined_at, points)
+                            (discord_guild_id, discord_member_id, name, avatar, created_at, nickname, display_name, joined_at, points)
                         VALUES((%s),(%s),(%s),(%s),(%s),(%s),(%s),(%s),(%s))
                             """
         logger.debug(f"Adding member:{name} to: {guild_id}")
@@ -557,7 +567,7 @@ class DB:
                             , nickname = (%s)
                             , display_name = (%s)
                             , joined_at = (%s)
-                        WHERE member_id = (%s)
+                        WHERE discord_member_id = (%s)
                         """
         logger.debug(f"Updating member: {name} in guild: {guild_id}")
         cur.execute(
@@ -597,7 +607,7 @@ class DB:
                             roles
                         SET
                             discord_guild_id = (%s)
-                            , role_name = (%s)
+                            , name = (%s)
                             , position = (%s)
                             , color = (%s)
                             , hoisted = (%s)
@@ -693,7 +703,7 @@ class DB:
                 DELETE FROM
                     members
                 WHERE
-                    member_id = (%s) 
+                    discord_member_id = (%s) 
                     and discord_guild_id = (%s)
                 """
         logger.debug(f"Deleting member: {member_id} in guild: {guild_id}")
@@ -756,7 +766,6 @@ class DB:
     - Any background database tasks
 
     """
-
     def sync(self, guilds=True, channels=True, members=True, roles=True, settings=True):
         """
         Allows us to sync the database with all discord server information.
@@ -782,7 +791,7 @@ class DB:
             :param cur: the database cursor
             """
             for guild in self.discord_client.guilds:
-                log.info("Syncing guild...")
+                logger.info("Syncing guild...")
                 if self.is_guild_in_db(guild.id) is None:
                     self.add_guild_to_db(
                         cur
@@ -794,6 +803,8 @@ class DB:
                         , guild.preferred_locale[1]
                         , datetime.now()
                         , guild.id
+                        , False
+                        , False
                     )
                 else:
                     self.update_guild_info(
@@ -948,6 +959,10 @@ class DB:
                     self.add_settings_to_db(
                         cur
                         , guild.id
+                        , self.discord_client.user.id
+                        , True
+                        , True
+                        , True
                         , True
                         , True
                         , datetime.now()
@@ -973,4 +988,7 @@ class DB:
             sync_settings_info(cur)
             self.connection.commit()
 
-
+def init_db(bot: Bot):
+    # This is called in the main bot file and is the bit of code that connects to the database.
+    db_client = DB(bot)
+    bot.db = db_client
