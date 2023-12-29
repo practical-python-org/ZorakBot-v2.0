@@ -7,6 +7,8 @@ services:
     image: zorakv2
     container_name: zorak_bot
     env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
     depends_on:
       - postgres
     restart: always
