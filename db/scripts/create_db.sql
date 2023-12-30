@@ -8,7 +8,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'guilds') THEN
         -- Create the table
         CREATE TABLE guilds (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             name TEXT,
             logo TEXT,
@@ -28,7 +28,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'members') THEN
         -- Create the table
         CREATE TABLE members (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             discord_member_id TEXT,
             name TEXT,
@@ -49,7 +49,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'channels') THEN
         -- Create the channels table
         CREATE TABLE channels (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             channel_id TEXT,
             channel_name TEXT,
@@ -72,7 +72,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'channel_settings') THEN
         -- Create the channel_settings table
         CREATE TABLE channel_settings (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             channel_id TEXT,
             join_log BOOL,
@@ -91,7 +91,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'roles') THEN
         -- Create the roles table
         CREATE TABLE roles (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             role_id TEXT,
             name TEXT,
@@ -113,7 +113,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'points') THEN
         -- Create the points table
         CREATE TABLE points (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             discord_member_id TEXT,
             points INT
@@ -128,7 +128,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'bot_settings') THEN
         -- Create the bot_settings table
         CREATE TABLE bot_settings (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             discord_bot_id TEXT,
             admin BOOL,
@@ -147,7 +147,7 @@ DO $$
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'moderation') THEN
         -- Create the moderation table
         CREATE TABLE moderation (
-            id INT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             discord_guild_id TEXT,
             discord_member_id TEXT,
             reason TEXT,

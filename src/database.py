@@ -44,8 +44,8 @@ class DB:
                             f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}"
                             f"/{os.getenv('POSTGRES_DB')}")
 
-        self.connection = psycopg.connect(self.conn_string)
-        self.cursor = self.connection.cursor()
+        # self.connection = psycopg.connect(self.conn_string)
+        # self.cursor = self.connection.cursor()
 
         self.discord_client = discord_client
 
@@ -65,14 +65,15 @@ class DB:
         -------
         :return: The first result of the query
         """
-        cursor = self.connection.cursor()
+        connection = psycopg.connect(self.conn_string)
+        cursor = connection.cursor()
         if data:
             cursor.execute(query, data)
         else:
             cursor.execute(query)
         data = cursor.fetchone()
-        self.connection.commit()
-        self.connection.close()
+        connection.commit()
+        connection.close()
         return data
 
     def select_all(self, query, *data):
@@ -88,14 +89,15 @@ class DB:
         -------
         :return: All results of the query
         """
-        cursor = self.connection.cursor()
+        connection = psycopg.connect(self.conn_string)
+        cursor = connection.cursor()
         if data:
             cursor.execute(query, data)
         else:
             cursor.execute(query)
         data = cursor.fetchall()
-        self.connection.commit()
-        self.connection.close()
+        connection.commit()
+        connection.close()
         return data
 
     def update(self, query, data):
@@ -111,11 +113,12 @@ class DB:
         -------
         :return: None - updates the database
         """
-        cursor = self.connection.cursor()
+        connection = psycopg.connect(self.conn_string)
+        cursor = connection.cursor()
 
-        cursor.execute(query, (data,))
-        self.connection.commit()
-        self.connection.close()
+        cursor.execute(query, data)
+        connection.commit()
+        connection.close()
 
     def insert(self, query, data):
         """
@@ -130,11 +133,12 @@ class DB:
         -------
         :return: None - inserts into the database
         """
-        cursor = self.connection.cursor()
+        connection = psycopg.connect(self.conn_string)
+        cursor = connection.cursor()
 
-        cursor.execute(query, (data,))
-        self.connection.commit()
-        self.connection.close()
+        cursor.execute(query, data)
+        connection.commit()
+        connection.close()
 
     def delete(self, query, data):
         """
@@ -149,11 +153,12 @@ class DB:
         -------
         :return: None - deletes an entry in the database
         """
-        cursor = self.connection.cursor()
+        connection = psycopg.connect(self.conn_string)
+        cursor = connection.cursor()
 
-        cursor.execute(query, (data,))
-        self.connection.commit()
-        self.connection.close()
+        cursor.execute(query, data)
+        connection.commit()
+        connection.close()
 
     """ 
     2nd Layer.
@@ -175,9 +180,8 @@ class DB:
         -------
         :return: boolean - if the data is in the database
         """
-        cursor = self.connection.cursor()
         query = f"SELECT * FROM {table_name} WHERE {column_name} = (%s)"
-        data = cursor.select_one(query, (value,))
+        data = self.select_one(query, (value,))
 
         if data is None:
             return False
@@ -209,7 +213,7 @@ class DB:
         -------
         :return: boolean - if the settings for a guild are in the database
         """
-        return self.is_data_in_db("settings", "discord_guild_id", str(guild_id))
+        return self.is_data_in_db("bot_settings", "discord_guild_id", str(guild_id))
 
     def is_channel_in_db(self, channel_id):
         """
@@ -556,7 +560,7 @@ class DB:
                    , g_nsfw_level
                    , g_language
                    , dt_now
-                   , str(guild_id),)
+                   , str(guild_id))
             )
         except Exception as e:
             logger.warning(f"failed to update guild: {g_name}, {guild_id}. Error: {e}")
@@ -802,15 +806,12 @@ class DB:
         :param settings: boolean indicating if we want to sync settings information
         """
 
-        def sync_guild_info(cur):
+        def sync_guild_info():
             """
             Syncs all guild information in the database.
             If the guild is not in the database, it will be added.
             If the guild is in the database, it will be updated.
 
-            Parameters
-            ----------
-            :param cur: the database cursor
             """
             logger.info("Starting database sync...")
 
@@ -841,15 +842,12 @@ class DB:
                         , guild.id
                     )
 
-        def sync_channel_info(cur):
+        def sync_channel_info():
             """
             Syncs all channel information in the database.
             If the channel does not exist in the database, it will be added.
             If the channel exists in the database, it will be updated.
 
-            Parameters
-            ----------
-            :param cur: the database cursor
             """
             for guild in self.discord_client.guilds:
                 logger.info("Syncing channel...")
@@ -883,15 +881,12 @@ class DB:
                             , datetime.now()
                         )
 
-        def sync_role_info(cur):
+        def sync_role_info():
             """
             Syncs all role information in the database.
             If the role does not exist in the database, it will be added.
             If the role exists in the database, it will be updated.
 
-            Parameters
-            ----------
-            :param cur: the database cursor
             """
             for guild in self.discord_client.guilds:
                 logger.info("Syncing roles...")
@@ -925,15 +920,12 @@ class DB:
                             , datetime.now()
                         )
 
-        def sync_member_info(cur):
+        def sync_member_info():
             """
             Syncs all member information in the database.
             If the member does not exist in the database, it will be added.
             If the member exists in the database, it will be updated.
 
-            Parameters
-            ----------
-            :param cur: the database cursor
             """
             for guild in self.discord_client.guilds:
                 logger.info("Syncing members...")
@@ -963,17 +955,14 @@ class DB:
                             , member.joined_at
                         )
 
-        def sync_settings_info(cur):
+        def sync_settings_info():
             """
             Created an entry in the settings table for a new guild.
             Existing guilds are not modified
 
-            Parameters
-            ----------
-            :param cur: the database cursor
             """
             for guild in self.discord_client.guilds:
-                logger.info("- Adding settings...")
+                logger.info("Adding settings...")
                 if not self.is_settings_in_db(guild.id):
                     self.add_settings_to_db(
                         guild.id
