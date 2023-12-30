@@ -1,15 +1,18 @@
 version: "3.8"
 services:
-  zorak-v2:
-    build: ./src
+  zorak:
+    build:
+      context: .
+      dockerfile: src/dockerfile
     image: zorakv2
     container_name: zorak_bot
     env_file: .env
-    links:
-      - "postgres:postgres"
+    environment:
+      POSTGRES_HOST: postgres
     depends_on:
       - postgres
     restart: always
+
 
   postgres:
     image: postgres:14-alpine

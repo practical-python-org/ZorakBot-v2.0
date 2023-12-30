@@ -5,13 +5,12 @@ import discord
 from discord.ext import commands
 
 from __logger__ import setup_logger
-
+from database import init_db
 
 logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-
 
 def setup() -> None:
     setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
@@ -59,6 +58,17 @@ async def load_cogs(robot: commands.Bot) -> None:
     logger.info("... Success.")
 
 
+def connect_to_db(flag_db):
+    if flag_db:
+        init_db(bot)
+        database_check = bot.db.get_all_tables_in_database()
+        logger.info(f"Healthchecking database...")
+        if database_check:
+            logger.info(f"Database is healthy and online.")
+        else:
+            logger.critical(f"Database is not healthy. Error: {database_check}")
+
+
 @bot.event
 async def setup_hook() -> None:
     """
@@ -74,6 +84,8 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
+    connect_to_db(True)
+    bot.db.sync()
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
 setup()
