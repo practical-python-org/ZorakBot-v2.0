@@ -38,13 +38,10 @@ async def load_cogs(robot: commands.Bot) -> None:
 
 
 def connect_to_db(flag_db):
-    healthy = False
-    for attempt in range(5):
-        if flag_db and not healthy:
-            init_db(bot)
-            logger.info(f"Healthchecking database...")
-            if bot.db.healthcheck():
-                return
+    if flag_db:
+        init_db(bot)
+        logger.info(f"Healthchecking database...")
+        bot.db.healthcheck()
 
 
 @bot.event
@@ -52,6 +49,7 @@ async def setup_hook() -> None:
     """
     The setup_hook executes before the bot logs in.
     """
+    connect_to_db(True)
     logger.debug("Executing set up hook...")
 
 
@@ -62,7 +60,6 @@ async def on_ready() -> None:
     """
     logger.debug("Executing on_ready event.")
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
-    connect_to_db(True)
     await load_cogs(bot)
 
 
