@@ -188,9 +188,6 @@ class DB:
         if healthy:
             return True
 
-
-
-
     """ 
     2nd Layer.
     From here we create:
@@ -312,8 +309,6 @@ class DB:
                  " WHERE table_schema='public';")
         return self.select_all(query)
 
-
-
     """
     3rd Layer. 
     From here we create:
@@ -323,8 +318,8 @@ class DB:
     """
 
     # ---------- Add commands
-    def add_guild_to_db(self, g_name, g_logo, g_created_at, g_member_count, g_nsfw_level
-                        , g_language, discord_guild_id, is_premium, is_test, dt_now):
+    def add_guild_to_guilds_table(self, g_name, g_logo, g_created_at, g_member_count, g_nsfw_level
+                                  , g_language, discord_guild_id, is_premium, is_test, dt_now):
         """
         Adds a guild to the database, along with all of its corresponding information
 
@@ -365,8 +360,8 @@ class DB:
         except Exception as e:
             logger.warning(f"Failed to add guild '{g_name}' to database. Error: {e}")
 
-    def add_settings_to_db(self, discord_guild_id, discord_member_id, admin, moderation
-                           , logs, antispam, fun, dt_now):
+    def add_settings_to_bot_settings_table(self, discord_guild_id, discord_member_id, admin, moderation
+                                           , logs, antispam, fun, dt_now):
         """
         Adds guild settings to the database
 
@@ -404,9 +399,9 @@ class DB:
         except Exception as e:
             logger.warning(f"Failed to add bot_settings for guild ID: '{discord_guild_id}' to database. Error: {e}")
 
-    def add_channel_to_db(self, guild_id, channel_id, name, category
-                          , position, mention, jump_url, permissions_synced
-                          , overwrites, created_at, last_synced):
+    def add_channel_to_channel_table(self, guild_id, channel_id, name, category
+                                     , position, mention, jump_url, permissions_synced
+                                     , overwrites, created_at, last_synced):
         """
         Adds all guild channel information to the database
 
@@ -461,8 +456,8 @@ class DB:
         except Exception as e:
             logger.warning(f"Failed to add channel '{name}' in Guild ID: '{guild_id}' to database. Error: {e}")
 
-    def add_member_to_db(self, guild_id, member_id, name, avatar, nickname
-                         , display_name, top_role, created_at, joined_at, last_synced):
+    def add_member_to_members_table(self, guild_id, member_id, name, avatar, nickname
+                                    , display_name, top_role, created_at, joined_at, last_synced):
         """
         Adds member from a specified guild to the database
 
@@ -495,9 +490,9 @@ class DB:
             logger.warning(f"Failed to add member '{name}, {member_id}' in Guild ID: '{guild_id}' to database."
                            f" Error: {e}")
 
-    def add_role_to_db(self, id_guild, role_id, role_name, position, color
-                       , hoisted, mentionable, managed, permissions, created_at
-                       , last_synced):
+    def add_role_to_roles_table(self, id_guild, role_id, role_name, position, color
+                                , hoisted, mentionable, managed, permissions, created_at
+                                , last_synced):
         """
         Adds all roles from a specified guild to the database
 
@@ -551,6 +546,30 @@ class DB:
             )
         except Exception as e:
             logger.warning(f"Failed to add role: {role_id} from guild: {id_guild}. Error: {e}")
+
+    def add_member_to_points_table(self, guild_id, member_id, points):
+        """
+
+        :param id_guild: The ID of the Guild
+        :param id_member: The ID of the Member
+        :param points: The amount of points
+
+        """
+        query = """INSERT 
+                        INTO points
+                            (discord_guild_id, discord_member_id, points)
+                        VALUES((%s),(%s),(%s))
+                            """
+        try:
+            logger.debug(f"Adding member to points table:{member_id} in {guild_id}")
+            self.insert(query,
+                        (str(guild_id), str(member_id), 0))
+        except Exception as e:
+            logger.warning(f"Failed to add member to points table: '{member_id}' in Guild ID: '{guild_id}'."
+                           f" Error: {e}")
+
+
+
 
     # ---------- Update commands
     def update_guild_info(self, g_name, g_logo, g_created_at, g_member_count
@@ -818,6 +837,27 @@ class DB:
         except Exception as e:
             logger.warning(f"Failed to delete channel: {channel_id} from guild: {guild_id}. Error: {e}")
 
+    def delete_member_from_points_table(self, guild_id, member_id):
+        """
+
+        :param id_guild: The ID of the Guild
+        :param id_member: The ID of the Member
+        """
+        query = """
+                    DELETE FROM
+                        points
+                    WHERE
+                        discord_member_id = (%s)
+                        AND discord_guild_id = (%s)
+                """
+        try:
+            logger.debug(f"Removing member from points table:{member_id} in {guild_id}")
+            self.delete(query,
+                        (str(guild_id), str(member_id)))
+        except Exception as e:
+            logger.warning(f"Failed to remove member from points table: '{member_id}' in Guild ID: '{guild_id}'."
+                           f" Error: {e}")
+
     """
     4th Layer. 
     From here we create:
@@ -851,7 +891,7 @@ class DB:
             for guild in self.discord_client.guilds:
                 logger.info("Syncing guild...")
                 if self.is_guild_in_db(guild.id) is None:
-                    self.add_guild_to_db(
+                    self.add_guild_to_guilds_table(
                         guild.name
                         , str(guild.icon)
                         , guild.created_at
@@ -886,7 +926,7 @@ class DB:
                 logger.info("Syncing channel...")
                 for channel in guild.channels:
                     if self.is_channel_in_db(channel.id) is None:
-                        self.add_channel_to_db(
+                        self.add_channel_to_channel_table(
                             channel.guild.id
                             , channel.id
                             , channel.name
@@ -925,7 +965,7 @@ class DB:
                 logger.info("Syncing roles...")
                 for role in guild.roles:
                     if self.is_role_in_db(role.id) is None:
-                        self.add_role_to_db(
+                        self.add_role_to_roles_table(
                             str(role.guild.id)
                             , str(role.id)
                             , role.name
@@ -964,7 +1004,7 @@ class DB:
                 logger.info("Syncing members...")
                 for member in guild.members:
                     if self.is_member_in_db(member.id) is None:
-                        self.add_member_to_db(
+                        self.add_member_to_members_table(
                             member.guild.id
                             , member.id
                             , member.name
@@ -997,7 +1037,7 @@ class DB:
             for guild in self.discord_client.guilds:
                 logger.info("Adding settings...")
                 if not self.is_settings_in_db(guild.id):
-                    self.add_settings_to_db(
+                    self.add_settings_to_bot_settings_table(
                         guild.id
                         , self.discord_client.user.id
                         , True
@@ -1022,6 +1062,76 @@ class DB:
 
         if settings:
             sync_settings_info()
+
+    """
+    5th layer.
+    Here we handle specific logic for certain features.
+    
+    """
+
+    # POINTS
+    def get_points(self, member):
+        select_query = """
+                        SELECT
+                            points 
+                        FROM
+                            points
+                        WHERE
+                            discord_member_id = (%s)
+                        """
+        return self.select_one(select_query, member.id)
+
+    def add_points(self, member, amount):
+        select_query = """
+                        SELECT
+                            points 
+                        FROM
+                            points
+                        WHERE
+                            discord_member_id = (%s)
+                        """
+        update_query = """UPDATE 
+                            points
+                        SET
+                            points = (%s)
+                        WHERE discord_member_id = (%s)
+                        """
+        try:
+            current_points = self.select_one(select_query, member.id)
+            new_points = current_points + amount
+
+            logger.debug(f"Adding {new_points} to {member.name} in guild: {member.guild.id}")
+            self.update(update_query, (new_points, member.id))
+
+        except Exception as e:
+            logger.warning(f"Failed to add points for: {member.name} in guild: {member.guild.id}. Error: {e}")
+
+    def remove_points(self, member, amount):
+        select_query = """
+                        SELECT
+                            points 
+                        FROM
+                            points
+                        WHERE
+                            discord_member_id = (%s)
+                        """
+        update_query = """
+                        UPDATE 
+                            points
+                        SET
+                            points = (%s)
+                        WHERE
+                            discord_member_id = (%s)
+                        """
+        try:
+            current_points = self.select_one(select_query, member.id)
+            new_points = current_points - amount
+
+            logger.debug(f"Removing {new_points} to {member.name} in guild: {member.guild.id}")
+            self.update(update_query, (new_points, member.id))
+
+        except Exception as e:
+            logger.warning(f"Failed to remove points for: {member.name} in guild: {member.guild.id}. Error: {e}")
 
 
 def init_db(bot: Bot):
