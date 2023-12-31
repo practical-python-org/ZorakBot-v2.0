@@ -23,7 +23,7 @@ def run_bot() -> None:
         "python __main__.py BOT_TOKEN_HERE"
     """
     if len(sys.argv) > 1:  # Check args for the token first
-        token = sys.argv[1].replace('TOKEN=','')
+        token = sys.argv[1].replace('TOKEN=', '')
         logger.debug('Loading Token from arg.')
         bot.run(token)
 
@@ -75,6 +75,7 @@ async def setup_hook() -> None:
     The setup_hook executes before the bot logs in.
     """
     logger.debug("Executing set up hook...")
+    connect_to_db(True)
 
 
 @bot.event
@@ -83,10 +84,10 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
-    connect_to_db(True)
     # bot.db.sync()
     await load_cogs(bot)
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
+
 
 setup()
 run_bot()

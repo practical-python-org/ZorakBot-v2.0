@@ -10,7 +10,7 @@ class Ping(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     async def ping(self, ctx: commands.Context) -> None:
         logger.debug("Ping command used.")
         await ctx.channel.send("poing")
