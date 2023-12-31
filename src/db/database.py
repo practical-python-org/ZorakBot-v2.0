@@ -1,6 +1,8 @@
 import os
 import logging
+import time
 import psycopg2 as psycopg
+from psycopg2 import OperationalError, Error
 from dotenv import load_dotenv
 from datetime import datetime
 from discord.ext.commands import Bot
@@ -160,6 +162,35 @@ class DB:
         connection.commit()
         connection.close()
 
+    def healthcheck(self):
+        healthy = False
+        if not healthy:
+            for i in range(5):
+                try:
+                    with psycopg.connect(self.conn_string):
+                        logger.info("PostgreSQL is online and ready to accept connections.")
+                        healthy = True
+                        break
+
+                except OperationalError as e:
+                    logger.critical(f"Error: {e}")
+                    logger.critical("PostgreSQL is not available or not ready to accept connections.")
+                    logger.critical(f"Retrying in 10 seconds. Attempt #{i}")
+                    time.sleep(10)
+
+
+                except Error as e:
+                    logger.critical(f"Error: {e}")
+                    logger.critical(f"Retrying in 10 seconds. Attempt #{i}")
+
+                    time.sleep(10)
+
+        if healthy:
+            return True
+
+
+
+
     """ 
     2nd Layer.
     From here we create:
@@ -280,6 +311,8 @@ class DB:
         query = ("SELECT table_name FROM information_schema.tables"
                  " WHERE table_schema='public';")
         return self.select_all(query)
+
+
 
     """
     3rd Layer. 
