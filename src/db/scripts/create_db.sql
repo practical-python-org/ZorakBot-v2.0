@@ -1,4 +1,9 @@
-CREATE DATABASE zorak_db;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'zorak_db') THEN
+        CREATE DATABASE zorak_db;
+    END IF;
+END $$;
 
 DO $$
     BEGIN
