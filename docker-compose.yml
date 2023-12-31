@@ -18,7 +18,7 @@ services:
     build:
       context: src/db/
       dockerfile: Dockerfile
-    image: postgres:16-bookworm-alpine
+    image: postgres:16.1-bullseye-alpine
     ports:
       - 5432:5432
     container_name: zorak_postgres
