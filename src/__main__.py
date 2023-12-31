@@ -59,8 +59,8 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
-    logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
     await load_cogs(bot)
+    logger.info(f"{bot.user.name} is online and ready to go.")
 
 
 def boink() -> None:
