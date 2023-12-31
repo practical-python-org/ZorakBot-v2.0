@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from __logger__ import setup_logger
-
+from db.database import init_db
 
 logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
@@ -24,7 +24,7 @@ def run_bot() -> None:
         "python __main__.py BOT_TOKEN_HERE"
     """
     if len(sys.argv) > 1:  # Check args for the token first
-        token = sys.argv[1].replace('TOKEN=','')
+        token = sys.argv[1].replace('TOKEN=', '')
         logger.debug('Loading Token from arg.')
         bot.run(token)
 
@@ -46,9 +46,9 @@ async def load_cogs(robot: commands.Bot) -> None:
     We do not load files starting with _ and the templates folder.
     """
     logger.info("Loading Cogs...")
-    for directory in os.listdir("./cogs"):
-        if not directory.startswith("_"):
-            for file in os.listdir(f"./cogs/{directory}"):
+    for directory in os.listdir("./src/cogs"):
+        if not directory.startswith("_") and directory != "templates":
+            for file in os.listdir(f"./src/cogs/{directory}"):
                 if file.endswith('.py') and not file.startswith("_"):
                     logger.debug(f"Loading Cog: \\{directory}\\{file}")
                     try:
@@ -59,13 +59,24 @@ async def load_cogs(robot: commands.Bot) -> None:
     logger.info("... Success.")
 
 
+def connect_to_db(flag_db):
+    if flag_db:
+        init_db(bot)
+        database_check = bot.db.get_all_tables_in_database()
+        logger.info(f"Healthchecking database...")
+        if database_check:
+            logger.info(f"Database is healthy and online.")
+        else:
+            logger.critical(f"Database is not healthy. Error: {database_check}")
+
+
 @bot.event
 async def setup_hook() -> None:
     """
     The setup_hook executes before the bot logs in.
     """
     logger.debug("Executing set up hook...")
-    await load_cogs(bot)
+    connect_to_db(True)
 
 
 @bot.event
@@ -74,7 +85,9 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
+    await load_cogs(bot)
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
+
 
 setup()
 run_bot()
