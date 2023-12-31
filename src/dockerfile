@@ -1,0 +1,9 @@
+FROM python:3.11.6-slim-bullseye AS builder-image
+ENV PYTHONUNBUFFERED=1
+WORKDIR /Zorakv2
+COPY . .
+# Not needed until adding voice. Until then, much faster without
+# RUN apt-get update && apt-get install -y ffmpeg
+RUN pip install -r src/requirements.txt
+
+ENTRYPOINT ["python", "src/__main__.py"]

@@ -12,7 +12,6 @@ intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
 
-
 def setup() -> None:
     setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
@@ -85,6 +84,7 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
+    # bot.db.sync()
     await load_cogs(bot)
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
