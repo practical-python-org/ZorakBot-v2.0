@@ -61,7 +61,6 @@ async def on_ready() -> None:
     The on_ready is executed AFTER the bot logs in.
     """
     logger.debug("Executing on_ready event.")
-    # bot.db.sync()
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
     connect_to_db(True)
     await load_cogs(bot)
