@@ -20,10 +20,11 @@ Checklist:
 
       
 ## File Overview
-- **db**
-  - database.py
-  - **DB schema** - A visual overview of the database
+
 - **src**
+  - **db**
+    - database.py
+  - **DB schema** - A visual overview of the database
   -  **/cogs**
     - **_templates** - Template cogs, for your development ease
     - **admin** - Admin commands

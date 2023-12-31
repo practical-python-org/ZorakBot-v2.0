@@ -2,3 +2,6 @@
 .gitignore
 LICENSE
 README.md
+db/DB Schema
+Dockerfile
+.dockerignore
