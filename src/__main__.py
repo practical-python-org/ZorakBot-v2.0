@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from __logger__ import setup_logger
-from database import init_db
+from db.database import init_db
 
 logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
@@ -75,7 +75,6 @@ async def setup_hook() -> None:
     The setup_hook executes before the bot logs in.
     """
     logger.debug("Executing set up hook...")
-    await load_cogs(bot)
 
 
 @bot.event
@@ -85,7 +84,8 @@ async def on_ready() -> None:
     """
     logger.debug("Executing on_ready event.")
     connect_to_db(True)
-    bot.db.sync()
+    # bot.db.sync()
+    await load_cogs(bot)
     logger.info(f'Logged in as {bot.user.name} - ({bot.user.id})')
 
 setup()
