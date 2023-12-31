@@ -9,13 +9,11 @@ from db.database import init_db
 
 
 logger = logging.getLogger(__name__)
+setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
+
 intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-
-
-def setup() -> None:
-    setup_logger(level=int(os.getenv("LOG_LEVEL")), stream_logs=bool(os.getenv("STREAM_LOGS")))
 
 
 async def load_cogs(robot: commands.Bot) -> None:
@@ -91,5 +89,4 @@ def boink() -> None:
         return
 
 
-setup()
 boink()
