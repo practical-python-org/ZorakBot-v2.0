@@ -18,7 +18,13 @@ Checklist:
 - [ ] Reaction roles
 - [ ] Music functions
 
-      
+## Getting started
+Make sure you edit the .env.TEMPLATE file, and include your token and prefix.
+
+Then simply run `docker compose up -d`
+
+To see your logs run `docker logs -f zorak_bot`
+
 ## File Overview
 
 - **src**
@@ -34,5 +40,6 @@ Checklist:
 - logger.py
 - main.py
 - .env
-      
+
+
       

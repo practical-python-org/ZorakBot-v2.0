@@ -1,28 +1,27 @@
 version: "3.8"
 services:
   zorak:
+    container_name: zorak_bot
+    env_file: .env
     build:
       context: .
       dockerfile: src/dockerfile
     image: zorakv2
-    container_name: zorak_bot
-    env_file: .env
     environment:
       POSTGRES_HOST: postgres
     depends_on:
       - postgres
     restart: always
 
-
   postgres:
+    container_name: zorak_postgres
+    env_file: .env
     build:
       context: src/db/
       dockerfile: Dockerfile
     image: postgres:16.1-bullseye-alpine
     ports:
       - 5432:5432
-    container_name: zorak_postgres
-    env_file: .env
     restart: always
     volumes:
       - ./src/db/scripts/:/docker-entrypoint-initdb.d
